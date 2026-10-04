@@ -1,0 +1,48 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# rust / anchor
+target/
+**/*.rs.bk
+.anchor/
+test-ledger/
+.surfpool/
+
+# env
+.env
+.env.*
+!.env.example
+
+# data cache
+**/data/cache/
+**/.cache/
+*.cache
+
+# solana / anchor keypairs
+**/keypairs/
+id.json
+*-keypair.json
+wallet.json
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor / os
+.DS_Store
+.vscode/
+.idea/
+
+# test / coverage
+coverage/
+.vitest-cache/

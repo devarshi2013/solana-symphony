@@ -1,0 +1,30 @@
+{
+  "name": "@solana-symphony/backtester",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Backtest engine + CLI",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "backtester": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@solana-symphony/dsl": "workspace:*",
+    "@solana-symphony/data": "workspace:*"
+  }
+}

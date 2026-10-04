@@ -1,0 +1,6 @@
+dist
+.next
+target
+node_modules
+pnpm-lock.yaml
+next-env.d.ts
