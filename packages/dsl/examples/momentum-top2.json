@@ -1,0 +1,20 @@
+{
+  "id": "momentum-top2",
+  "name": "Momentum top 2",
+  "description": "Each week, hold the two tokens with the highest 30-day return out of SOL, JUP, JTO, BONK and WIF, split equally.",
+  "version": 1,
+  "rebalance": "weekly",
+  "root": {
+    "type": "filter",
+    "sortBy": { "type": "indicator", "name": "cumulativeReturn", "symbol": "", "window": 30 },
+    "order": "top",
+    "select": 2,
+    "children": [
+      { "type": "asset", "symbol": "SOL" },
+      { "type": "asset", "symbol": "JUP" },
+      { "type": "asset", "symbol": "JTO" },
+      { "type": "asset", "symbol": "BONK" },
+      { "type": "asset", "symbol": "WIF" }
+    ]
+  }
+}

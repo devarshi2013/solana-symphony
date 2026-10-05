@@ -1,0 +1,25 @@
+{
+  "id": "rsi-dip",
+  "name": "RSI dip buyer",
+  "description": "Go all-in on SOL when its 14-day RSI is oversold (below 30); otherwise hold half SOL, half USDC.",
+  "version": 1,
+  "rebalance": "daily",
+  "root": {
+    "type": "if",
+    "condition": {
+      "lhs": { "type": "indicator", "name": "rsi", "symbol": "SOL", "window": 14 },
+      "op": "<",
+      "rhs": { "type": "number", "value": 30 }
+    },
+    "then": { "type": "asset", "symbol": "SOL" },
+    "else": {
+      "type": "weight",
+      "mode": "specified",
+      "weights": [0.5, 0.5],
+      "children": [
+        { "type": "asset", "symbol": "SOL" },
+        { "type": "asset", "symbol": "USDC" }
+      ]
+    }
+  }
+}

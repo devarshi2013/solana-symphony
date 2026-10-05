@@ -1,0 +1,17 @@
+{
+  "id": "sol-trend",
+  "name": "SOL trend",
+  "description": "Hold SOL while its price is above its 100-day simple moving average; otherwise sit in USDC.",
+  "version": 1,
+  "rebalance": "daily",
+  "root": {
+    "type": "if",
+    "condition": {
+      "lhs": { "type": "indicator", "name": "price", "symbol": "SOL" },
+      "op": ">",
+      "rhs": { "type": "indicator", "name": "sma", "symbol": "SOL", "window": 100 }
+    },
+    "then": { "type": "asset", "symbol": "SOL" },
+    "else": { "type": "asset", "symbol": "USDC" }
+  }
+}

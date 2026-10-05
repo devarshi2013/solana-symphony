@@ -1,0 +1,57 @@
+{
+  "id": "nested",
+  "name": "Risk-on / risk-off rotation",
+  "description": "When SOL is above its 50-day SMA, hold 60% SOL plus 40% in the best 30-day performer of JUP, JTO and BONK. Otherwise hold liquid staking tokens weighted by inverse 20-day volatility.",
+  "version": 1,
+  "rebalance": "weekly",
+  "driftThresholdPct": 10,
+  "root": {
+    "type": "if",
+    "condition": {
+      "lhs": { "type": "indicator", "name": "price", "symbol": "SOL" },
+      "op": ">",
+      "rhs": { "type": "indicator", "name": "sma", "symbol": "SOL", "window": 50 }
+    },
+    "then": {
+      "type": "group",
+      "name": "Risk-on",
+      "child": {
+        "type": "weight",
+        "mode": "specified",
+        "weights": [0.6, 0.4],
+        "children": [
+          { "type": "asset", "symbol": "SOL" },
+          {
+            "type": "filter",
+            "sortBy": {
+              "type": "indicator",
+              "name": "cumulativeReturn",
+              "symbol": "",
+              "window": 30
+            },
+            "order": "top",
+            "select": 1,
+            "children": [
+              { "type": "asset", "symbol": "JUP" },
+              { "type": "asset", "symbol": "JTO" },
+              { "type": "asset", "symbol": "BONK" }
+            ]
+          }
+        ]
+      }
+    },
+    "else": {
+      "type": "group",
+      "name": "Risk-off",
+      "child": {
+        "type": "weight",
+        "mode": "inverse-volatility",
+        "window": 20,
+        "children": [
+          { "type": "asset", "symbol": "JitoSOL" },
+          { "type": "asset", "symbol": "mSOL" }
+        ]
+      }
+    }
+  }
+}

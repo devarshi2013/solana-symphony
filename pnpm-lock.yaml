@@ -236,7 +236,11 @@ importers:
 
   packages/data: {}
 
-  packages/dsl: {}
+  packages/dsl:
+    dependencies:
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
 
   packages/vault-client: {}
 
