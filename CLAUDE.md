@@ -9,6 +9,7 @@ that a keeper bot rebalances via Jupiter swaps.
 - `packages/dsl` — strategy language: the JSON logic-tree format and its evaluator
 - `packages/data` — loads and caches historical price data
 - `packages/backtester` — backtest engine and the `backtester` CLI (uses dsl + data)
+- `packages/config` — loads `.env` and validates it with zod into a typed config (`getConfig()`)
 - `packages/vault-client` — TypeScript client for the on-chain vault program
 - `programs/vault` — Anchor program that holds user deposits and enforces vault rules
 - `apps/keeper` — Node bot that evaluates strategies and rebalances vaults via Jupiter
