@@ -11,11 +11,11 @@ that a keeper bot rebalances via Jupiter swaps.
 - `packages/backtester` — backtest engine and the `backtester` CLI (uses dsl + data)
 - `packages/config` — loads `.env` and validates it with zod into a typed config (`getConfig()`)
 - `packages/vault-client` — TypeScript client for the on-chain vault program
-- `programs/vault` — Anchor program that holds user deposits and enforces vault rules
+- `programs/vault` — Anchor vault program; `programs/mock-swap` — TEST-ONLY devnet swap venue
 - `apps/keeper` — Node bot that evaluates strategies and rebalances vaults via Jupiter
 - `apps/web` — Next.js app for building, backtesting, and depositing
 
-Most of these are empty scaffolds; check the code before assuming something exists.
+Many are still scaffolds; check the code before assuming something exists.
 
 ## Stack
 
@@ -35,7 +35,13 @@ pnpm test           # vitest in every package
 pnpm lint           # eslint over the repo
 pnpm typecheck      # tsc --noEmit, tests included
 pnpm format         # prettier --write
-pnpm build:program  # anchor build
+pnpm build:program  # anchor build --arch v0 (plain anchor build makes SBPF v3: undeployable)
+pnpm test:program   # Rust + LiteSVM tests; test:program:ts = TS tests on a local validator
+pnpm data:fetch     # download daily candles into data/cache/ (needs PRICE_API_* in .env)
+pnpm data:check     # report gaps, duplicates, bad prices and >80% moves in data/cache/
+pnpm data:import <file.csv> <SYMBOL>  # merge your own candles into data/cache/
+pnpm backtest <strategy.json> --start YYYY-MM-DD --benchmark SOL  # report in out/<id>/
+pnpm backtest:serve # POST /backtest API on 127.0.0.1:4000 (CORS: localhost:3000)
 ```
 
 Run `pnpm lint`, `pnpm typecheck`, and `pnpm test` before calling work done.

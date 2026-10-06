@@ -1,6 +1,12 @@
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { ConfigError, ENV_VARS, loadConfig, type EnvVarName } from "./config.js";
+import {
+  ConfigError,
+  ENV_VARS,
+  loadConfig,
+  loadPriceApiConfig,
+  type EnvVarName,
+} from "./config.js";
 import { readEnvFile } from "./env-file.js";
 
 const validEnv: Record<EnvVarName, string> = {
@@ -91,6 +97,39 @@ describe("loadConfig", () => {
     expect(err.message).not.toContain("price-secret-123");
     expect(err.message).not.toContain("anthropic-secret-456");
     expect(err.message).not.toContain("not-a-url");
+  });
+});
+
+describe("PRICE_API_PROVIDER", () => {
+  it("accepts birdeye and coingecko", () => {
+    expect(loadConfig({ ...validEnv, PRICE_API_PROVIDER: "coingecko" }).priceApi.provider).toBe(
+      "coingecko",
+    );
+  });
+
+  it("rejects other providers by name", () => {
+    const err = captureError({ ...validEnv, PRICE_API_PROVIDER: "kaiko" });
+    expect(err.invalid.map((i) => i.name)).toEqual(["PRICE_API_PROVIDER"]);
+    expect(err.message).toContain('expected one of "birdeye"|"coingecko"');
+  });
+});
+
+describe("loadPriceApiConfig", () => {
+  it("needs only the price API variables", () => {
+    expect(loadPriceApiConfig({ PRICE_API_PROVIDER: "birdeye", PRICE_API_KEY: "k" })).toEqual({
+      provider: "birdeye",
+      apiKey: "k",
+    });
+  });
+
+  it("names only its own missing variables", () => {
+    try {
+      loadPriceApiConfig({ PRICE_API_PROVIDER: "birdeye" });
+      expect.unreachable();
+    } catch (err) {
+      expect(err).toBeInstanceOf(ConfigError);
+      expect((err as ConfigError).missing).toEqual(["PRICE_API_KEY"]);
+    }
   });
 });
 

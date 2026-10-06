@@ -1,5 +1,3 @@
-skip_local_validator = true
-
 [toolchain]
 
 [features]
@@ -7,13 +5,22 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-vault = "9rH4ChbiGz7QzTQBJ89VvgLMA8xf2jjjcW5TZXffC7x3"
+vault = "5RAyigJyfZDreAfJsGufXcgtRraMq1hrEp3sm2nZqsHG"
+# TEST-ONLY mock swap venue (devnet/localnet only; there is no mainnet entry on purpose).
+mock_swap = "pG9QphRAdj8stz3vLU4W7MHkmg3c5ehp9Q779xroqjP"
+
+[programs.devnet]
+vault = "5RAyigJyfZDreAfJsGufXcgtRraMq1hrEp3sm2nZqsHG"
+# TEST-ONLY mock swap venue.
+mock_swap = "pG9QphRAdj8stz3vLU4W7MHkmg3c5ehp9Q779xroqjP"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "cargo test"
+# Needs a local validator: run `pnpm test:program:ts` (or `anchor test --validator legacy
+# --provider.cluster localnet`). The Rust tests run without one: `pnpm test:program`.
+test = "pnpm --filter @solana-symphony/vault run test:anchor"
 
 [hooks]

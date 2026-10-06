@@ -4,6 +4,9 @@ import { z } from "zod";
 export const CLUSTERS = ["devnet", "testnet", "mainnet-beta", "localnet"] as const;
 export type Cluster = (typeof CLUSTERS)[number];
 
+export const PRICE_API_PROVIDERS = ["birdeye", "coingecko"] as const;
+export type PriceApiProvider = (typeof PRICE_API_PROVIDERS)[number];
+
 const httpUrl = z.url({ protocol: /^https?$/ });
 
 const envSchema = z.object({
@@ -11,7 +14,7 @@ const envSchema = z.object({
   SOLANA_CLUSTER: z.enum(CLUSTERS),
   KEEPER_KEYPAIR_PATH: z.string().refine(isAbsolute, "must be an absolute path"),
   PRICE_API_KEY: z.string(),
-  PRICE_API_PROVIDER: z.string(),
+  PRICE_API_PROVIDER: z.enum(PRICE_API_PROVIDERS),
   ANTHROPIC_API_KEY: z.string(),
   DATABASE_URL: z.url(),
   ALERT_WEBHOOK_URL: httpUrl,
@@ -23,10 +26,15 @@ export const ENV_VARS = Object.keys(envSchema.shape) as EnvVarName[];
 export interface Config {
   readonly solana: { readonly rpcUrl: string; readonly cluster: Cluster };
   readonly keeper: { readonly keypairPath: string };
-  readonly priceApi: { readonly provider: string; readonly apiKey: string };
+  readonly priceApi: PriceApiConfig;
   readonly anthropic: { readonly apiKey: string };
   readonly database: { readonly url: string };
   readonly alerts: { readonly webhookUrl: string };
+}
+
+export interface PriceApiConfig {
+  readonly provider: PriceApiProvider;
+  readonly apiKey: string;
 }
 
 export interface InvalidEnvVar {
@@ -60,15 +68,45 @@ export class ConfigError extends Error {
  * process.env. Empty or whitespace-only values count as missing.
  */
 export function loadConfig(env: Readonly<Record<string, string | undefined>>): Config {
+  const e = validateVars(ENV_VARS, env);
+  return deepFreeze({
+    solana: { rpcUrl: e.SOLANA_RPC_URL, cluster: e.SOLANA_CLUSTER },
+    keeper: { keypairPath: e.KEEPER_KEYPAIR_PATH },
+    priceApi: { provider: e.PRICE_API_PROVIDER, apiKey: e.PRICE_API_KEY },
+    anthropic: { apiKey: e.ANTHROPIC_API_KEY },
+    database: { url: e.DATABASE_URL },
+    alerts: { webhookUrl: e.ALERT_WEBHOOK_URL },
+  });
+}
+
+/**
+ * Like loadConfig, but validates only PRICE_API_PROVIDER and PRICE_API_KEY, for tools
+ * (such as the price history fetcher) that need nothing else.
+ */
+export function loadPriceApiConfig(
+  env: Readonly<Record<string, string | undefined>>,
+): PriceApiConfig {
+  const e = validateVars(["PRICE_API_PROVIDER", "PRICE_API_KEY"], env);
+  return deepFreeze({ provider: e.PRICE_API_PROVIDER, apiKey: e.PRICE_API_KEY });
+}
+
+type EnvValues = z.infer<typeof envSchema>;
+
+/** Validates just `names`, throwing a ConfigError that lists every missing or invalid one. */
+function validateVars<K extends EnvVarName>(
+  names: readonly K[],
+  env: Readonly<Record<string, string | undefined>>,
+): Pick<EnvValues, K> {
   const input: Partial<Record<EnvVarName, string>> = {};
   const missing: EnvVarName[] = [];
-  for (const name of ENV_VARS) {
+  for (const name of names) {
     const value = env[name]?.trim();
     if (value) input[name] = value;
     else missing.push(name);
   }
 
-  const result = envSchema.safeParse(input);
+  // Missing names were collected above; partial() validates only the ones present.
+  const result = envSchema.partial().safeParse(input);
   const invalid: InvalidEnvVar[] = [];
   if (!result.success) {
     for (const issue of result.error.issues) {
@@ -80,16 +118,7 @@ export function loadConfig(env: Readonly<Record<string, string | undefined>>): C
   }
 
   if (!result.success || missing.length > 0) throw new ConfigError(missing, invalid);
-
-  const e = result.data;
-  return deepFreeze({
-    solana: { rpcUrl: e.SOLANA_RPC_URL, cluster: e.SOLANA_CLUSTER },
-    keeper: { keypairPath: e.KEEPER_KEYPAIR_PATH },
-    priceApi: { provider: e.PRICE_API_PROVIDER, apiKey: e.PRICE_API_KEY },
-    anthropic: { apiKey: e.ANTHROPIC_API_KEY },
-    database: { url: e.DATABASE_URL },
-    alerts: { webhookUrl: e.ALERT_WEBHOOK_URL },
-  });
+  return result.data as Pick<EnvValues, K>;
 }
 
 function deepFreeze<T extends object>(obj: T): T {

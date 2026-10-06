@@ -15,9 +15,17 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "fetch-history": "node dist/fetch-history.js",
+    "data-check": "node dist/data-check.js",
+    "data-import": "node dist/data-import.js"
   },
   "files": [
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "@solana-symphony/config": "workspace:*",
+    "@solana-symphony/dsl": "workspace:*",
+    "zod": "^4.6.5"
+  }
 }

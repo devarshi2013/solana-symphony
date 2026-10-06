@@ -46,3 +46,6 @@ pnpm-debug.log*
 # test / coverage
 coverage/
 .vitest-cache/
+
+# local deploy rehearsals (addresses on a throwaway ledger)
+deployments/localnet.json

@@ -1,0 +1,5 @@
+# LiteSVM 0.17 (needed to load SBPF v3 programs) requires Rust 1.97.1.
+# The program itself still builds with the repo's pinned 1.89.0.
+[toolchain]
+channel = "1.97.1"
+profile = "minimal"

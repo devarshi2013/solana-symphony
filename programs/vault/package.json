@@ -1,0 +1,16 @@
+{
+  "name": "@solana-symphony/vault",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TypeScript integration tests for the vault program (run through anchor test)",
+  "type": "module",
+  "scripts": {
+    "test:anchor": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@anchor-lang/core": "1.2.0",
+    "@solana/spl-token": "0.4.15",
+    "@solana/web3.js": "^1.98.4"
+  }
+}

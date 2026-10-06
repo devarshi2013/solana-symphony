@@ -1,0 +1,26 @@
+[package]
+name = "vault-litesvm-tests"
+version = "0.0.0"
+description = "Integration tests for the vault program, run in LiteSVM against target/deploy/vault.so"
+edition.workspace = true
+publish = false
+
+# Separate from programs/vault so `anchor build` (Rust 1.89) never compiles LiteSVM,
+# which needs Rust 1.97.1 (see rust-toolchain.toml here).
+
+[dependencies]
+
+[dev-dependencies]
+vault = { path = "../../programs/vault", features = ["no-entrypoint"] }
+mock-swap = { path = "../../programs/mock-swap", features = ["no-entrypoint"] }
+pyth-solana-receiver-sdk = "2.0.0"
+anchor-lang = "1.2.0"
+anchor-spl = { version = "1.2.0", default-features = false, features = ["token", "associated_token", "token_2022"] }
+litesvm = "0.17.0"
+base64 = "0.22"
+solana-account = "4.3.0"
+solana-keypair = "3.1.2"
+solana-program-option = "3.1.0"
+solana-program-pack = "3.1.0"
+solana-signer = "3.0.1"
+solana-transaction = "4.1.5"
